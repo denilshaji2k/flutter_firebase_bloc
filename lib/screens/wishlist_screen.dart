@@ -84,6 +84,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                                 duration: Duration(seconds: 1),
                               ),
                             );
+                            context.read<ProductBloc>().add(LoadWishlist(authState.user.id));
                           }
                         },
                       ),
