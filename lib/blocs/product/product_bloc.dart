@@ -1,5 +1,6 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:gapp_bloc/repositories/wishlist_repository.dart';
+import '../auth/auth_bloc.dart';
 import '../../repositories/product_repository.dart';
 import 'product_event.dart';
 import 'product_state.dart';
@@ -7,9 +8,13 @@ import 'product_state.dart';
 class ProductBloc extends Bloc<ProductEvent, ProductState> {
   final ProductRepository _productRepository;
   final WishlistRepository _wishlistRepository = WishlistRepository();
+  final AuthBloc _authBloc;
 
-  ProductBloc({required ProductRepository productRepository})
-      : _productRepository = productRepository,
+  ProductBloc({
+    required ProductRepository productRepository,
+    required AuthBloc authBloc,
+  })  : _productRepository = productRepository,
+        _authBloc = authBloc,
         super(ProductInitial()) {
     on<LoadProducts>(_onLoadProducts);
     on<LoadWishlist>(_onLoadWishlist);
@@ -24,7 +29,15 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
     emit(ProductLoading());
     try {
       final products = await _productRepository.getProducts();
-      emit(ProductLoaded(products));
+      Set<String> wishlistIds = {};
+      
+      final authState = _authBloc.state;
+      if (authState is AuthSuccess) {
+        final wishlistProducts = await _wishlistRepository.getWishlistProducts(authState.user.id);
+        wishlistIds = wishlistProducts.map((p) => p.id).toSet();
+      }
+      
+      emit(ProductLoaded(products, wishlistIds: wishlistIds));
     } catch (e) {
       emit(ProductError(e.toString()));
     }
@@ -45,8 +58,13 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   Future<void> _onAddToWishlist(AddToWishlist event, Emitter<ProductState> emit) async {
     try {
       await _wishlistRepository.addToWishlist(event.userId, event.product);
-      final wishlist = await _wishlistRepository.getWishlistProducts(event.userId);
-      emit(WishlistLoaded(wishlist));
+      
+      if (state is ProductLoaded) {
+        final currentState = state as ProductLoaded;
+        emit(currentState.copyWith(
+          wishlistIds: {...currentState.wishlistIds, event.product.id},
+        ));
+      }
     } catch (e) {
       emit(ProductError(e.toString()));
     }
@@ -55,8 +73,13 @@ class ProductBloc extends Bloc<ProductEvent, ProductState> {
   Future<void> _onRemoveFromWishlist(RemoveFromWishlist event, Emitter<ProductState> emit) async {
     try {
       await _wishlistRepository.removeFromWishlist(event.userId, event.productId);
-      final wishlist = await _wishlistRepository.getWishlistProducts(event.userId);
-      emit(WishlistLoaded(wishlist));
+      
+      if (state is ProductLoaded) {
+        final currentState = state as ProductLoaded;
+        final newWishlistIds = Set<String>.from(currentState.wishlistIds)
+          ..remove(event.productId);
+        emit(currentState.copyWith(wishlistIds: newWishlistIds));
+      }
     } catch (e) {
       emit(ProductError(e.toString()));
     }

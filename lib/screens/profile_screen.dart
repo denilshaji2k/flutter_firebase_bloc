@@ -33,28 +33,24 @@ class ProfileScreen extends StatelessWidget {
                 leading: const Icon(Icons.shopping_bag),
                 title: const Text('My Orders'),
                 onTap: () {
-                  // TODO: Navigate to orders screen
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.location_on),
                 title: const Text('Shipping Addresses'),
                 onTap: () {
-                  // TODO: Navigate to addresses screen
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.payment),
                 title: const Text('Payment Methods'),
                 onTap: () {
-                  // TODO: Navigate to payment methods screen
                 },
               ),
               ListTile(
                 leading: const Icon(Icons.settings),
                 title: const Text('Settings'),
                 onTap: () {
-                  // TODO: Navigate to settings screen
                 },
               ),
             ],

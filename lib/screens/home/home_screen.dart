@@ -107,109 +107,123 @@ class ProductListScreen extends StatelessWidget {
           return const Center(child: CircularProgressIndicator());
         }
         if (state is ProductLoaded) {
-          return GridView.builder(
-            padding: const EdgeInsets.all(8),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              childAspectRatio: 0.7,
-              crossAxisSpacing: 10,
-              mainAxisSpacing: 10,
+          return Scaffold(
+            appBar: AppBar(
+              title: const Text('Products'),
             ),
-            itemCount: state.products.length,
-            itemBuilder: (context, index) {
-              final product = state.products[index];
-              return Card(
-                child: InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ProductDetailsScreen(product: product),
-                      ),
-                    );
-                  },
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: Image.network(
-                          product.imageUrl,
-                          fit: BoxFit.cover,
+            body: GridView.builder(
+              padding: const EdgeInsets.all(8),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                childAspectRatio: 0.7,
+                crossAxisSpacing: 10,
+                mainAxisSpacing: 10,
+              ),
+              itemCount: state.products.length,
+              itemBuilder: (context, index) {
+                final product = state.products[index];
+                final bool isInWishlist = state.wishlistIds.contains(product.id);
+                return Card(
+                  child: InkWell(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ProductDetailsScreen(product: product),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              product.name,
-                              style: const TextStyle(fontWeight: FontWeight.bold),
-                            ),
-                            if (product.isOnSale) ...[
-                              Text(
-                                '\₹${product.discountPrice}',
-                                style: const TextStyle(
-                                  color: Colors.red,
-                                  fontWeight: FontWeight.bold,
+                      );
+                    },
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Stack(
+                            children: [
+                                SizedBox(
+                                width: double.infinity,
+                                height: double.infinity,
+                                child: Image.network(
+                                  product.imageUrl,
+                                  fit: BoxFit.cover,
                                 ),
                               ),
+                            
+                            ],
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
                               Text(
-                                '\₹${product.price}',
-                                style: const TextStyle(
-                                  decoration: TextDecoration.lineThrough,
-                                ),
+                                product.name,
+                                style: const TextStyle(fontWeight: FontWeight.bold),
                               ),
-                            ] else
-                              Text('\₹${product.price}'),
-                          ],
+                              if (product.isOnSale) ...[
+                                Text(
+                                  '\₹${product.discountPrice}',
+                                  style: const TextStyle(
+                                    color: Colors.red,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  '\₹${product.price}',
+                                  style: const TextStyle(
+                                    decoration: TextDecoration.lineThrough,
+                                  ),
+                                ),
+                              ] else
+                                Text('\₹${product.price}'),
+                            ],
+                          ),
                         ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(8.0),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            IconButton(
-                              icon: const Icon(Icons.favorite_border),
-                              onPressed: () {
-                                if (authState is AuthSuccess) {
-                                  context.read<ProductBloc>().add(
-                                    AddToWishlist(authState.user.id, product),
-                                  );
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('product ddded to wishlist'),
-                                      duration: Duration(seconds: 1),
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
-                            IconButton(
-                              icon: const Icon(Icons.shopping_cart),
-                              onPressed: () {
-                                if (authState is AuthSuccess) {
-                                  context.read<CartBloc>().add(
-                                    AddToCart(authState.user.id, product),
-                                  );
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                      content: Text('added to cart'),
-                                      duration: Duration(seconds: 1),
-                                    ),
-                                  );
-                                }
-                              },
-                            ),
-                          ],
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                                IconButton(
+                                  icon: Icon(
+                                    isInWishlist ? Icons.favorite : Icons.favorite_border,
+                                    color: isInWishlist ? Colors.red : null,
+                                  ),
+                                  onPressed: () {
+                                    if (authState is AuthSuccess) {
+                                      context.read<ProductBloc>().add(
+                                        isInWishlist
+                                            ? RemoveFromWishlist(authState.user.id, product.id)
+                                            : AddToWishlist(authState.user.id, product),
+                                      );
+                                    }
+                                  },
+                                ),
+                              IconButton(
+                                icon: const Icon(Icons.shopping_cart),
+                                onPressed: () {
+                                  if (authState is AuthSuccess) {
+                                    context.read<CartBloc>().add(
+                                      AddToCart(authState.user.id, product),
+                                    );
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                        content: Text('added to cart'),
+                                        duration: Duration(seconds: 1),
+                                      ),
+                                    );
+                                  }
+                                },
+                              ),
+                            ],
+                          ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           );
         }
         if (state is ProductError) {

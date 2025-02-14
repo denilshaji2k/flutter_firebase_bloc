@@ -12,11 +12,23 @@ class ProductLoading extends ProductState {}
 
 class ProductLoaded extends ProductState {
   final List<ProductModel> products;
+  final Set<String> wishlistIds;
 
-  ProductLoaded(this.products);
+  ProductLoaded(this.products, {Set<String>? wishlistIds}) 
+      : wishlistIds = wishlistIds ?? {};
 
   @override
-  List<Object> get props => [products];
+  List<Object> get props => [products, wishlistIds];
+
+  ProductLoaded copyWith({
+    List<ProductModel>? products,
+    Set<String>? wishlistIds,
+  }) {
+    return ProductLoaded(
+      products ?? this.products,
+      wishlistIds: wishlistIds ?? this.wishlistIds,
+    );
+  }
 }
 
 class WishlistLoaded extends ProductState {
