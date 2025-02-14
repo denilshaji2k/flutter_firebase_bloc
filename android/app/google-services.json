@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "1067782187321",
+    "project_id": "gapp-bloc",
+    "storage_bucket": "gapp-bloc.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1067782187321:android:ace4082f98b4229984e0e8",
+        "android_client_info": {
+          "package_name": "com.example.gapp_bloc"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1067782187321-fon0s12mp03eh704rcdo7gvib4ehiokm.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.gapp_bloc",
+            "certificate_hash": "ec0dfcc01fce343ae5b885d141657e0ea6343b63"
+          }
+        },
+        {
+          "client_id": "1067782187321-cc4q96l32fljh9hag0vvaringdaufuvp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6gIKjYYWUEVd50cXG9V5YkcU2y8FMksE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1067782187321-cc4q96l32fljh9hag0vvaringdaufuvp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
